@@ -1,0 +1,45 @@
+# ═══════════════════════════════════════════════════════════
+#  Campus Handbook Guide — Python Dependencies
+#  Target : NVIDIA Jetson Nano (4 GB RAM)  |  Python 3.8+
+#  UI     : Flask web app  (replaces Tkinter)
+# ═══════════════════════════════════════════════════════════
+
+# ── Web framework ────────────────────────────────────────────
+Flask>=2.3.0              # lightweight WSGI server + routing
+Werkzeug>=2.3.0           # secure_filename + request utilities
+                          # (installed automatically with Flask)
+
+# ── PDF parsing ─────────────────────────────────────────────
+PyMuPDF>=1.23.0           # fitz — fast PDF text extraction
+
+# ── Vector search ────────────────────────────────────────────
+faiss-cpu>=1.7.4          # IndexFlatIP  (CPU-only, Jetson-safe)
+                          # On Jetson with CUDA: replace with faiss-gpu
+
+# ── Embeddings ───────────────────────────────────────────────
+sentence-transformers>=2.6.0   # all-MiniLM-L6-v2
+torch>=2.0.0                   # required by sentence-transformers
+                               # Jetson Nano: install from NVIDIA wheel
+                               # https://forums.developer.nvidia.com/t/pytorch-for-jetson
+
+# ── LLM (local, offline) ─────────────────────────────────────
+ollama>=0.1.7             # Python client for Ollama REST API
+                          # Ollama itself must be installed separately:
+                          # https://ollama.com/download/linux
+
+# ── Numerical ────────────────────────────────────────────────
+numpy>=1.24.0
+
+# ── System monitoring ────────────────────────────────────────
+psutil>=5.9.0             # RAM / CPU metrics in the sidebar
+
+# ── Notes for Jetson Nano ────────────────────────────────────
+# 1. PyTorch: use the NVIDIA-provided aarch64 wheel, NOT pip default.
+#    https://developer.nvidia.com/embedded/downloads
+# 2. faiss-cpu builds fine on aarch64 via pip.
+# 3. sentence-transformers will auto-detect CPU (no CUDA config needed).
+# 4. Ollama must run as a service: `ollama serve` in a separate terminal.
+# 5. Pull the model once (needs internet): `ollama pull llama3.2:1b`
+# 6. tkinter is no longer required — the UI is now browser-based.
+# 7. Access the app from any device on the same network:
+#    http://<JETSON_IP>:5000

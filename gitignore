@@ -1,0 +1,70 @@
+# ═══════════════════════════════════════════════════════════
+#  Campus Handbook Guide — .gitignore
+# ═══════════════════════════════════════════════════════════
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Environment variables
+.env
+*.env.local
+
+# Generated index artifacts (large binary files — build on device)
+handbook.index
+chunks.pkl
+faiss_index/
+
+# Uploaded PDF (may be confidential campus document)
+handbook.pdf
+uploads/
+
+# Flask instance folder (session secrets, SQLite DBs if added later)
+instance/
+
+# Flask session files (if using filesystem sessions)
+flask_session/
+
+# Logs
+*.log
+logs/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter notebooks (if any experiments)
+.ipynb_checkpoints/
+*.ipynb
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Test cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
