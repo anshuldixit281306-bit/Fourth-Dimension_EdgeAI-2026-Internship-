@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Campus Handbook Guide</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <!-- Offline fallback: fonts are loaded but the app works without them -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>📘</text></svg>" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <span class="sidebar-icon">📘</span>
+    <div class="sidebar-title-wrap">
+      <span class="sidebar-title">Campus Handbook</span>
+      <span class="sidebar-subtitle">Offline RAG · Jetson Nano</span>
+    </div>
+  </div>
+
+  <hr class="sidebar-divider" />
+
+  <!-- PDF Section -->
+  <section class="sidebar-section">
+    <h3 class="sidebar-section-title">DOCUMENT</h3>
+
+    <div class="pdf-info-card" id="pdfInfoCard">
+      <span class="pdf-icon">📄</span>
+      <div class="pdf-details">
+        <span class="pdf-name" id="pdfName">No PDF loaded</span>
+        <span class="pdf-size" id="pdfSize">—</span>
+      </div>
+    </div>
+
+    <label class="btn btn-upload" id="uploadLabel" title="Upload a campus handbook PDF">
+      <span class="btn-icon">📂</span> Upload PDF
+      <input type="file" id="fileInput" accept=".pdf" hidden />
+    </label>
+
+    <div class="upload-progress hidden" id="uploadProgress">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span class="progress-label" id="progressLabel">Uploading…</span>
+    </div>
+
+    <button class="btn btn-rebuild" id="rebuildBtn" title="Rebuild vector index from current PDF">
+      <span class="btn-icon">🔄</span> Rebuild Index
+    </button>
+
+    <div class="rebuild-status hidden" id="rebuildStatus">
+      <span class="rebuild-spinner">⏳</span>
+      <span id="rebuildLabel">Rebuilding…</span>
+    </div>
+  </section>
+
+  <hr class="sidebar-divider" />
+
+  <!-- System Status -->
+  <section class="sidebar-section">
+    <h3 class="sidebar-section-title">SYSTEM STATUS</h3>
+
+    <div class="status-grid">
+      <div class="status-row">
+        <span class="status-label">Ollama</span>
+        <span class="status-badge" id="ollamaStatus">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Embeddings</span>
+        <span class="status-badge" id="embedStatus">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">FAISS Index</span>
+        <span class="status-badge" id="faissStatus">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Chunks</span>
+        <span class="status-value" id="chunksCount">—</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="sidebar-divider" />
+
+  <!-- Resource Monitor -->
+  <section class="sidebar-section">
+    <h3 class="sidebar-section-title">RESOURCES</h3>
+
+    <div class="resource-item">
+      <div class="resource-header">
+        <span class="resource-label">RAM</span>
+        <span class="resource-value" id="ramValue">—</span>
+      </div>
+      <div class="resource-bar">
+        <div class="resource-fill resource-fill--ram" id="ramBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="resource-item">
+      <div class="resource-header">
+        <span class="resource-label">CPU</span>
+        <span class="resource-value" id="cpuValue">—</span>
+      </div>
+      <div class="resource-bar">
+        <div class="resource-fill resource-fill--cpu" id="cpuBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="resource-meta">
+      <span id="modelLabel">Model: —</span>
+    </div>
+  </section>
+
+  <hr class="sidebar-divider" />
+
+  <!-- Chat Controls -->
+  <section class="sidebar-section sidebar-section--actions">
+    <button class="btn btn-clear" id="clearBtn" title="Clear chat history">
+      <span class="btn-icon">🗑</span> Clear Chat
+    </button>
+    <button class="btn btn-export" id="exportBtn" title="Export conversation as Markdown">
+      <span class="btn-icon">💾</span> Export Chat
+    </button>
+  </section>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <span class="footer-dot" id="systemDot"></span>
+    <span class="footer-status" id="systemFooter">Initialising…</span>
+  </div>
+
+</aside><!-- /sidebar -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MAIN AREA
+════════════════════════════════════════════════════════════════ -->
+<div class="main" id="main">
+
+  <!-- Mobile header -->
+  <header class="mobile-header">
+    <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="mobile-title">📘 Campus Handbook</span>
+    <span class="mobile-status-dot" id="mobileStatusDot"></span>
+  </header>
+
+  <!-- Chat window -->
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-messages" id="chatMessages">
+
+      <!-- Welcome card -->
+      <div class="welcome-card" id="welcomeCard">
+        <div class="welcome-icon">📘</div>
+        <h2 class="welcome-title">Campus Handbook Guide</h2>
+        <p class="welcome-sub">
+          Ask any question about your campus handbook.<br/>
+          All processing happens <strong>locally on this device</strong> — no internet required.
+        </p>
+        <div class="welcome-chips">
+          <button class="chip" data-q="What is the late submission policy?">Late submission policy</button>
+          <button class="chip" data-q="How do I apply for a leave of absence?">Leave of absence</button>
+          <button class="chip" data-q="What are the library opening hours?">Library hours</button>
+          <button class="chip" data-q="What GPA is required for the Dean's List?">Dean's List GPA</button>
+        </div>
+      </div>
+
+    </div><!-- /chat-messages -->
+  </div><!-- /chat-window -->
+
+  <!-- Input area -->
+  <div class="input-area">
+    <div class="input-row">
+      <textarea
+        id="questionInput"
+        class="question-input"
+        placeholder="Ask a question about the handbook…"
+        rows="1"
+        maxlength="2000"
+        aria-label="Your question"
+      ></textarea>
+      <button class="send-btn" id="sendBtn" aria-label="Send" title="Send (Enter)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="input-meta">
+      <span id="charCount">0 / 2000</span>
+      <span id="lastResponseTime"></span>
+    </div>
+  </div><!-- /input-area -->
+
+</div><!-- /main -->
+
+<!-- Overlay for mobile sidebar -->
+<div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+
+<!-- Toast notifications -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
