@@ -386,20 +386,6 @@ The first query after startup is slower as Ollama loads the model weights into R
 
 ---
 
-## Screenshots
-
-> *(Add screenshots after deployment)*
-
-| Screen | Description |
-|---|---|
-| `docs/main_ui.png` | Full chat interface in browser |
-| `docs/sidebar_status.png` | System status and resource monitor |
-| `docs/mobile_view.png` | Mobile-responsive layout |
-| `docs/pdf_upload.png` | PDF upload flow |
-| `docs/rebuild_progress.png` | Index rebuild in progress |
-| `docs/answer_citation.png` | Answer with page citation |
-
-
 ## Acknowledgements
 
 - [Flask](https://flask.palletsprojects.com) — lightweight Python web framework
