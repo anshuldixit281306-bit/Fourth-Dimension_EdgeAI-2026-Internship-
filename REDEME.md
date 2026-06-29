@@ -399,13 +399,6 @@ The first query after startup is slower as Ollama loads the model weights into R
 | `docs/rebuild_progress.png` | Index rebuild in progress |
 | `docs/answer_citation.png` | Answer with page citation |
 
----
-
-## License
-
-MIT License — see `LICENSE` for details.
-
----
 
 ## Acknowledgements
 
